@@ -21,15 +21,15 @@ public class DistributedLockAspect {
     @Autowired
     private RedisTemplate redisTemplate;
 //    distributedLock1
-    @Around("@annotation(lock)")
-    public Object around(ProceedingJoinPoint joinPoint, DistributedLock lock) throws Throwable {
+    @Around("@annotation(distributedLock)")
+    public Object around(ProceedingJoinPoint joinPoint, DistributedLock distributedLock) throws Throwable {
         // 获取锁名
-        String lockKey = lock.value();
+        String lockKey = distributedLock.value();
         if (StringUtils.isBlank(lockKey)) {
             lockKey = joinPoint.getSignature().toLongString();
         }
         // 获取锁的过期时间
-        long expire = lock.expire();
+        long expire = distributedLock.expire();
         // 尝试获取锁
         Boolean acquired = redisTemplate.opsForValue().setIfAbsent(lockKey, 1, expire, TimeUnit.SECONDS);
         if (acquired != null && acquired) {
