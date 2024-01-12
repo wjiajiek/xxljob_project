@@ -20,7 +20,6 @@ public class DistributedLockAspect {
 
     @Autowired
     private RedisTemplate redisTemplate;
-//    distributedLock1
     @Around("@annotation(distributedLock)")
     public Object around(ProceedingJoinPoint joinPoint, DistributedLock distributedLock) throws Throwable {
         // 获取锁名
@@ -36,8 +35,9 @@ public class DistributedLockAspect {
             try {
                 XxlJobHelper.log("【{}】获取分布式锁成功",lockKey);
                 log.info("【{}】获取分布式锁成功",lockKey);
+                Object proceed = joinPoint.proceed();
                 // 执行目标方法
-                return joinPoint.proceed();
+                return proceed;
             } finally {
                // 释放锁
                 redisTemplate.delete(lockKey);
